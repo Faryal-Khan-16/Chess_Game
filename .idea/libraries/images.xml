@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="images">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/out/production/Chess-Game-main/com/chessgame/Resources/images" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
