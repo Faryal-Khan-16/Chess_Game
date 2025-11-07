@@ -2,104 +2,109 @@ package com.chessgame.Frame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Help extends JFrame {
-
+    private JTextArea instructionsText;
+    private JButton backButton;
 
     public Help() {
-        initComponents();
+        initializeFrame();
+        createComponents();
+        setupLayout();
+        setupEventListeners();
     }
 
+    private void initializeFrame() {
+        setTitle("Chess Master Pro - Instructions");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(900, 700);
+        setLocationRelativeTo(null);
+        setResizable(false);
+    }
 
-    private void initComponents() {
-        // Main panel setup
-        JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.BLACK);
-        mainPanel.setLayout(new BorderLayout());
+    private void createComponents() {
+        instructionsText = new JTextArea();
+        instructionsText.setEditable(false);
+        instructionsText.setLineWrap(true);
+        instructionsText.setWrapStyleWord(true);
+        instructionsText.setFont(new Font("Arial", Font.PLAIN, 16));
+        instructionsText.setBackground(Color.WHITE);
+        instructionsText.setText(getInstructionsContent());
 
-        // Title panel
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(Color.BLACK);
-        titlePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        backButton = new JButton("Back to Home");
+        backButton.setFont(new Font("Arial", Font.BOLD, 18));
+        backButton.setPreferredSize(new Dimension(200, 50));
+    }
 
-        JLabel backLabel = new JLabel("Back");
-        backLabel.setFont(new Font("Segoe UI", Font.PLAIN, 24));
-        backLabel.setForeground(Color.WHITE);
-        backLabel.addMouseListener(new MouseAdapter() {
+    private String getInstructionsContent() {
+        return "CHESS MASTER PRO - INSTRUCTIONS\n\n" +
+                "GAME RULES:\n" +
+                "• Chess is a two-player strategy game played on an 8x8 board.\n" +
+                "• Each player controls 16 pieces: 1 King, 1 Queen, 2 Rooks, 2 Bishops, 2 Knights, and 8 Pawns.\n" +
+                "• White always moves first.\n" +
+                "• The objective is to checkmate the opponent's King.\n\n" +
+                "PIECE MOVEMENT:\n" +
+                "• King: Moves one square in any direction\n" +
+                "• Queen: Moves any number of squares diagonally, horizontally, or vertically\n" +
+                "• Rook: Moves any number of squares horizontally or vertically\n" +
+                "• Bishop: Moves any number of squares diagonally\n" +
+                "• Knight: Moves in an L-shape (2 squares in one direction, then 1 square perpendicular)\n" +
+                "• Pawn: Moves forward one square, captures diagonally\n\n" +
+                "SPECIAL MOVES:\n" +
+                "• Castling: King moves 2 squares toward a Rook, and the Rook moves to the other side\n" +
+                "• En Passant: Special pawn capture\n" +
+                "• Promotion: Pawn reaching the opposite end becomes a Queen, Rook, Bishop, or Knight\n\n" +
+                "HOW TO PLAY:\n" +
+                "1. Click on a piece to select it\n" +
+                "2. Possible moves will be highlighted\n" +
+                "3. Click on the destination square to move\n" +
+                "4. Press LEFT ARROW key to undo a move\n" +
+                "5. The game ends when a King is checkmated or it's a stalemate";
+    }
+
+    private void setupLayout() {
+        setLayout(new BorderLayout());
+
+        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        contentPanel.setBackground(Color.LIGHT_GRAY);
+
+        JLabel titleLabel = new JLabel("Chess Instructions", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setForeground(Color.BLUE);
+
+        JScrollPane scrollPane = new JScrollPane(instructionsText);
+        scrollPane.setPreferredSize(new Dimension(800, 500));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
+        buttonPanel.add(backButton);
+
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(contentPanel);
+    }
+
+    private void setupEventListeners() {
+        backButton.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent evt) {
-                onBackLabelClicked();
+            public void actionPerformed(ActionEvent e) {
+                new Home().setVisible(true);
+                dispose();
             }
         });
-
-        JLabel titleLabel = new JLabel("INSTRUCTIONS");
-        titleLabel.setFont(new Font("Franklin Gothic Heavy", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
-
-        titlePanel.add(backLabel);
-        titlePanel.add(Box.createHorizontalStrut(30));
-        titlePanel.add(titleLabel);
-
-        // Content panel
-        JPanel contentPanel = new JPanel();
-        contentPanel.setBackground(Color.BLACK);
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-
-        addContent(contentPanel);
-
-        // Add panels to main frame
-        mainPanel.add(titlePanel, BorderLayout.NORTH);
-        mainPanel.add(new JScrollPane(contentPanel), BorderLayout.CENTER);
-
-        // Frame setup
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setTitle("Help");
-        setSize(1050, 550);
-        setLocationRelativeTo(null);
-        add(mainPanel);
-    }
-
-
-    private void addContent(JPanel contentPanel) {
-        contentPanel.add(createLabel("   At the start, each player controls sixteen pieces: one king, one queen, two rooks, two bishops, two knights, and eight pawns.", 18));
-        contentPanel.add(createLabel("   The player who moves first controls white pieces, and the other controls black pieces. ", 18));
-        contentPanel.add(createLabel("   The object of the game is to checkmate the opponent's king, whereby the king is under immediate attack and", 18));
-        contentPanel.add(createLabel("   there is no way for it to escape.", 18));
-        contentPanel.add(createLabel("   There are also several ways a game can end in a draw.", 18));
-
-        contentPanel.add(Box.createVerticalStrut(20));
-
-        contentPanel.add(createLabel("   CHESS RULES", 24, true));
-        contentPanel.add(createLabel("   Click on the \"Start\" button to start the game", 20));
-        contentPanel.add(createLabel("   Click on any piece to see the possible locations to move them.", 20));
-        contentPanel.add(createLabel("   Press left arrow key to undo the moves", 20));
-        contentPanel.add(createLabel("   Click on the \"Exit\" button or close icon to leave the game", 20));
-    }
-
-
-    private JLabel createLabel(String text, int fontSize) {
-        return createLabel(text, fontSize, false);
-    }
-
-
-    private JLabel createLabel(String text, int fontSize, boolean bold) {
-        JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", bold ? Font.BOLD : Font.PLAIN, fontSize));
-        label.setForeground(Color.WHITE);
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        return label;
-    }
-
-
-    private void onBackLabelClicked() {
-        new Home().setVisible(true);
-        dispose();
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Help().setVisible(true));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Help().setVisible(true);
+            }
+        });
     }
 }

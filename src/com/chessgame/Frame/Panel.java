@@ -6,97 +6,96 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
-import com.chessgame.Game.*;
+import com.chessgame.Game.Game;
 import com.chessgame.Pieces.Piece;
 
 public class Panel extends JPanel {
-
 	private static final long serialVersionUID = 1L;
-	Game game;
-	int ti,tj;
-	public static int xx, yy;
-	JPanel panel = this;
-	
-	Panel(){
-		this.setFocusable(true);
-		this.addMouseListener(new Listener());
-		this.addMouseMotionListener(new Listener());
-		this.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == 37) {
-					Game.board.undoMove();
-				}
-			}
-		});
-		game = new Game();
+	private Game game;
+	private int tempX, tempY;
+	public static int mouseX, mouseY;
 
+	public Panel() {
+		initializePanel();
 	}
-	
+
+	private void initializePanel() {
+		this.setFocusable(true);
+		this.setDoubleBuffered(true);
+		this.addMouseListener(new ChessMouseListener());
+		this.addMouseMotionListener(new ChessMouseListener());
+		this.addKeyListener(new ChessKeyListener());
+		this.game = new Game();
+	}
+
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		game.draw(g, xx, yy, this);
+		if (game != null) {
+			game.draw(g, mouseX, mouseY, this);
+		}
 	}
-	
 
-	
-
-	class Listener extends MouseAdapter{
+	private class ChessMouseListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				int x = e.getX()/Piece.size;
-				int y = e.getY()/Piece.size;
-				Game.drag = false;
-				game.active = null;
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				int x = e.getX() / Piece.SIZE;
+				int y = e.getY() / Piece.SIZE;
+				Game.isDragging = false;
 				game.selectPiece(x, y);
-				revalidate();
 				repaint();
 			}
 		}
-		
+
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			// temp index i and j for the gui
-			ti = e.getX()/Piece.size;
-			tj = e.getY()/Piece.size;
-			if(Game.board.getPiece(ti, tj) != null)  {
+			tempX = e.getX() / Piece.SIZE;
+			tempY = e.getY() / Piece.SIZE;
+			if (game.getBoard().getPiece(tempX, tempY) != null) {
 				setCursor(new Cursor(Cursor.HAND_CURSOR));
-			}
-			else {
+			} else {
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
-			revalidate();
-			repaint();
 		}
-		
+
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(!Game.drag && game.active != null) {
-				game.active = null;
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				Game.isDragging = true;
+				mouseX = e.getX();
+				mouseY = e.getY();
+				int boardX = e.getX() / Piece.SIZE;
+				int boardY = e.getY() / Piece.SIZE;
+				game.selectPiece(boardX, boardY);
+				repaint();
 			}
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				game.selectPiece(e.getX()/Piece.size, e.getY()/Piece.size);
-				Game.drag = true;
-				xx = e.getX();
-				yy = e.getY();				
-			}
-			revalidate();
-			repaint();
 		}
-		
+
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			int x = e.getX() / Piece.size;
-			int y = e.getY() / Piece.size;
-			game.move(x, y);
-			revalidate();
-			repaint();
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				int x = e.getX() / Piece.SIZE;
+				int y = e.getY() / Piece.SIZE;
+				game.move(x, y);
+				repaint();
+			}
 		}
-
 	}
 
+	private class ChessKeyListener extends KeyAdapter {
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+				game.getBoard().undoMove();
+				repaint();
+			}
+		}
+	}
+
+	public Game getGame() {
+		return game;
+	}
 }

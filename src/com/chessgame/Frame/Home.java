@@ -3,91 +3,109 @@ package com.chessgame.Frame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Home extends JFrame {
+    private JButton startButton;
+    private JButton instructionsButton;
+    private JButton exitButton;
+    private JLabel backgroundLabel;
 
     public Home() {
-        initComponents();
+        initializeFrame();
+        createComponents();
+        setupLayout();
+        setupEventListeners();
     }
 
-    private void initComponents() {
-        // Create main panel with GridBagLayout to center components
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setBackground(new Color(165, 211, 108)); // Light green background
-
-        // Button panel for Start, Instructions, and Exit buttons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false); // Make panel transparent
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-
-        // Create identical-sized boxes for buttons
-        buttonPanel.add(createButtonBox("START", 28));
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(createButtonBox("INSTRUCTIONS", 28));
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(createButtonBox("EXIT", 28));
-
-        // Add button panel to the main panel
-        mainPanel.add(buttonPanel, new GridBagConstraints());
-
-        // Frame setup
-        setTitle("Home");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    private void initializeFrame() {
+        setTitle("Chess Master Pro - Home");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
-        add(mainPanel);
+        setResizable(false);
     }
 
+    private void createComponents() {
+        startButton = new JButton("START");
+        instructionsButton = new JButton("INSTRUCTIONS");
+        exitButton = new JButton("EXIT");
 
-    private JPanel createButtonBox(String text, int fontSize) {
-        JPanel box = new JPanel();
-        box.setPreferredSize(new Dimension(300, 80)); // Fixed size for all boxes
-        box.setLayout(new BorderLayout());
-        box.setOpaque(false);
+        // Style buttons
+        styleButton(startButton);
+        styleButton(instructionsButton);
+        styleButton(exitButton);
 
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.BOLD, fontSize));
-        button.setBackground(new Color(186, 210, 166));
-        button.setForeground(Color.BLACK);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        button.setPreferredSize(new Dimension(300, 80)); // Matches the box size
-
-        // Add button to the box
-        box.add(button, BorderLayout.CENTER);
-
-        // Add action listeners
-        if (text.equals("START")) {
-            button.addActionListener(evt -> onStartButtonClicked());
-        } else if (text.equals("INSTRUCTIONS")) {
-            button.addActionListener(evt -> onInstructionsButtonClicked());
-        } else if (text.equals("EXIT")) {
-            button.addActionListener(evt -> onExitButtonClicked());
+        // Background (you can set your own image path)
+        backgroundLabel = new JLabel();
+        backgroundLabel.setLayout(new GridBagLayout());
+        try {
+            ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/Resources/images/chess-background.jpg"));
+            backgroundLabel.setIcon(backgroundIcon);
+        } catch (Exception e) {
+            backgroundLabel.setBackground(Color.DARK_GRAY);
+            backgroundLabel.setOpaque(true);
         }
-
-        return box;
     }
 
-
-    private void onStartButtonClicked() {
-        new Frame().setVisible(true);
-        dispose();
+    private void styleButton(JButton button) {
+        button.setBackground(Color.BLACK);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        button.setPreferredSize(new Dimension(250, 60));
+        button.setFocusPainted(false);
     }
 
+    private void setupLayout() {
+        setLayout(new BorderLayout());
 
-    private void onInstructionsButtonClicked() {
-        new Help().setVisible(true);
-        dispose();
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.setLayout(new GridLayout(3, 1, 0, 20));
+        buttonPanel.add(startButton);
+        buttonPanel.add(instructionsButton);
+        buttonPanel.add(exitButton);
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setOpaque(false);
+        centerPanel.add(buttonPanel);
+
+        backgroundLabel.add(centerPanel);
+        add(backgroundLabel, BorderLayout.CENTER);
     }
 
+    private void setupEventListeners() {
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Frame().setVisible(true);
+                dispose();
+            }
+        });
 
-    private void onExitButtonClicked() {
-        System.exit(0);
+        instructionsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Help().setVisible(true);
+                dispose();
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
     }
-
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Home().setVisible(true));
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Home().setVisible(true);
+            }
+        });
     }
 }
