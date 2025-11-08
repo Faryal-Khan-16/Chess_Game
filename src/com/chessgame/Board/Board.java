@@ -58,15 +58,27 @@ public class Board implements Cloneable {
             capturedPieces.push(capturedPiece);
             piecesList.remove(capturedPiece);
             capturedPiece.setAlive(false);
+
+            // Clear the captured piece from the board
+            pieces[toX][toY] = null;
+            grid[toX][toY] = 0;
+
+            // Also remove from GameStateManager lists
+            com.chessgame.Game.GameStateManager.getAllPieces().remove(capturedPiece);
+            if (capturedPiece.isWhite()) {
+                com.chessgame.Game.GameStateManager.getWhitePieces().remove(capturedPiece);
+            } else {
+                com.chessgame.Game.GameStateManager.getBlackPieces().remove(capturedPiece);
+            }
         } else {
             capturedPieces.push(null);
         }
 
-        // CRITICAL FIX: Clear the original position FIRST
+        // Clear the original position
         grid[fromX][fromY] = 0;
         pieces[fromX][fromY] = null;
 
-        // Then set the new position
+        // Set the new position
         grid[toX][toY] = piece.getValueInTheboard();
         pieces[toX][toY] = piece;
 
@@ -109,6 +121,14 @@ public class Board implements Cloneable {
             pieces[move.getToX()][move.getToY()] = captured;
             captured.setXcord(move.getToX());
             captured.setYcord(move.getToY());
+
+            // Also restore to GameStateManager lists
+            com.chessgame.Game.GameStateManager.getAllPieces().add(captured);
+            if (captured.isWhite()) {
+                com.chessgame.Game.GameStateManager.getWhitePieces().add(captured);
+            } else {
+                com.chessgame.Game.GameStateManager.getBlackPieces().add(captured);
+            }
         } else {
             grid[move.getToX()][move.getToY()] = 0;
             pieces[move.getToX()][move.getToY()] = null;
