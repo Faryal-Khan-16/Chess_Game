@@ -96,9 +96,13 @@ public class GameController {
     }
 
     private void drawPieces(Graphics g, JPanel panel) {
-        for (Piece p : stateManager.getAllPieces()) {
-            if (p != game.activePiece || !Game.isDragging) {
-                p.draw(g, false, panel);
+        // ✅ FIXED: Draw pieces from the actual board state instead of pieces list
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Piece p = board.getPiece(x, y);
+                if (p != null && (p != game.activePiece || !Game.isDragging)) {
+                    p.draw(g, false, panel);
+                }
             }
         }
     }
